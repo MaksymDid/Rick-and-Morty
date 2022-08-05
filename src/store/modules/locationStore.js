@@ -5,27 +5,31 @@ const userStore = {
   state: {
     locations: [],
     locationItem: {},
+    locationsPages: {}
   },
   getters: {
     charactersID: ({locationItem}) => {
       return locationItem.residents.map(item => {
         return item.split('/').pop()
-      }).join(',')
+      })
     }
   },
   mutations: {
     SET_LOCATIONS: (state, locations) => state.locations = locations.results,
-    SET_CLEAN_LOCATION: state => state.locationItem = {},
     SET_LOCATION: (state, location) => state.locationItem = location,
+    SET_LOCATIONS_PAGES: (state, pages) => state.locationsPages = pages,
   },
   actions: {
-    async getLocations({commit}) {
+    async getLocations({commit}, params = null) {
       try {
         const res = await HTTP.get('location', {
-          params: {}
+          params: params
         })
         commit('SET_LOCATIONS', res.data)
-        commit('SET_COUNT_INFO', {name: 'Location', count: res.data.info.count}, {root:true})
+        if (!params) {
+          commit('SET_LOCATIONS_PAGES', {pages: res.data.info.pages})
+          commit('SET_COUNT_INFO', {name: 'Location', count: res.data.info.count}, {root: true})
+        }
       } catch (error) {
         console.log(error)
       }
@@ -33,7 +37,6 @@ const userStore = {
     async getLocation({commit}, id) {
       try {
         const res = await HTTP.get(`location/${id}`)
-        commit('SET_CLEAN_LOCATION')
         const location = {
           ...res.data,
           created: res.data.created.slice(0, 10)

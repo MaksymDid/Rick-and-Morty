@@ -14,7 +14,7 @@
           >
             <v-list-item three-line>
               <v-list-item-content>
-                <router-link class='link' :to="{ name: 'EpisodeItem', params: { id: episode.id } }">
+                <router-link class='link' :to="{ name: 'EpisodeItemPage', params: { id: episode.id } }">
                   <div class='text-h6 mb-1'>
                     {{ episode.name }}
                   </div>
@@ -31,16 +31,53 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-row justify='center'>
+      <v-col cols='8'>
+        <v-container class='max-width'>
+          <v-pagination
+            v-model='page'
+            class='my-3'
+            :length='this.episodesPages.pages'
+          ></v-pagination>
+        </v-container>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default {
   name: 'EpisodesPage',
+  data() {
+    return {
+      page: 0
+    }
+  },
   computed: {
-    ...mapState('episodeStore', ['episodes'])
+    ...mapState({
+      episodes: state => state.episodeStore.episodes,
+      episodesPages: state => state.episodeStore.episodesPages,
+    })
+  },
+  created() {
+    this.page = 1
+  },
+  watch: {
+    page: {
+      async handler() {
+        this.loading = true
+        await this.getEpisodes({page: this.page})
+        this.loading = false
+      },
+      deep: true
+    }
+  },
+  methods: {
+    ...mapActions({
+      getEpisodes: 'episodeStore/getEpisodes'
+    })
   }
 }
 </script>

@@ -14,7 +14,7 @@
           >
             <v-list-item three-line>
               <v-list-item-content>
-                <router-link class='link' :to="{ name: 'LocationItem', params: { id: location.id } }">
+                <router-link class='link' :to="{ name: 'LocationItemPage', params: { id: location.id } }">
                   <div class='text-h6 mb-1'>
                     {{ location.name }}
                   </div>
@@ -34,16 +34,55 @@
         </v-col>
       </v-row>
     </v-container>
+    <v-row justify='center'>
+      <v-col cols='8'>
+        <v-container class='max-width'>
+          <v-pagination
+            v-model='page'
+            class='my-3'
+            :length='this.locationsPages.pages'
+          ></v-pagination>
+        </v-container>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapActions, mapState} from 'vuex'
 
 export default {
   name: 'LocationsPage',
+  data() {
+    return{
+      page: 0,
+      loading: false
+    }
+  },
   computed: {
-    ...mapState('locationStore', ['locations'])
+    ...mapState(
+      {
+        locations: state => state.locationStore.locations,
+        locationsPages: state => state.locationStore.locationsPages,
+      })
+  },
+  created() {
+    this.page = 1
+  },
+  watch: {
+    page: {
+      async handler() {
+        this.loading = true
+        await this.getLocations({page: this.page})
+        this.loading = false
+      },
+      deep: true
+    }
+  },
+  methods: {
+    ...mapActions({
+      getLocations: 'locationStore/getLocations'
+    })
   }
 }
 </script>

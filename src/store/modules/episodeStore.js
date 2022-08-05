@@ -5,29 +5,34 @@ const userStore = {
   state: {
     episodes: [],
     episodeItem: {},
-    episodesById: []
+    episodesById: [],
+    episodesPages: {}
   },
   getters: {
     charactersID: ({episodeItem}) => {
       return episodeItem.characters.map(item => {
-       return item.split('/').pop()
-      }).join(',')
+        return item.split('/').pop()
+      })
     }
   },
   mutations: {
     SET_EPISODES: (state, episodes) => state.episodes = episodes.results,
     SET_CLEAN_EPISODE: state => state.episodeItem = {},
     SET_EPISODE: (state, episode) => state.episodeItem = episode,
-    SET_EPISODES_BY_IDS: (state, characters) => state.episodesById = characters
+    SET_EPISODES_BY_IDS: (state, characters) => state.episodesById = characters,
+    SET_EPISODES_PAGES: (state, pages) => state.episodesPages = pages
   },
   actions: {
-    async getEpisodes ({commit}) {
+    async getEpisodes({commit}, params = null) {
       try {
         const res = await HTTP.get('episode', {
-          params: {}
+          params: params
         })
         commit('SET_EPISODES', res.data)
-        commit('SET_COUNT_INFO', {name: 'Episode', count: res.data.info.count}, {root:true})
+        if (!params) {
+          commit('SET_COUNT_INFO', {name: 'Episode', count: res.data.info.count}, {root: true})
+          commit('SET_EPISODES_PAGES', {pages: res.data.info.pages})
+        }
       } catch (error) {
         console.log(error)
       }
@@ -40,7 +45,7 @@ const userStore = {
         console.log(error)
       }
     },
-    async getEpisode ({commit}, id) {
+    async getEpisode({commit}, id) {
       try {
         const res = await HTTP.get(`episode/${id}`)
         commit('SET_CLEAN_EPISODE')

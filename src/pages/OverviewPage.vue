@@ -38,8 +38,6 @@ export default {
       getCharacters: 'characterStore/getCharacters'
     })
   }
-
-
 }
 </script>
 
