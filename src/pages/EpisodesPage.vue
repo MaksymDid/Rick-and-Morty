@@ -3,31 +3,19 @@
     <v-container class='wrap lighten-5 pa-4'>
       <v-row>
         <v-col
+          cols='12'
+          md='6'
+          sm='12'
           v-for='episode in episodes'
           :key='episode.id'
         >
-          <v-card
+          <v-skeleton-loader
+            v-if='loading'
             max-width='500'
-            min-width='400'
-            class='ma-5 item'
-            outlined
-          >
-            <v-list-item three-line>
-              <v-list-item-content>
-                <router-link class='link' :to="{ name: 'EpisodeItemPage', params: { id: episode.id } }">
-                  <div class='text-h6 mb-1'>
-                    {{ episode.name }}
-                  </div>
-                </router-link>
-                <div class='mb-2'>
-                  Episode: {{ episode.episode }}
-                </div>
-                <div class='mb-2'>
-                  Air date: {{ episode.air_date }}
-                </div>
-              </v-list-item-content>
-            </v-list-item>
-          </v-card>
+            min-width='420'
+            type='card-heading, list-item-three-line'
+          ></v-skeleton-loader>
+          <EpisodesCard v-else :episode='episode' />
         </v-col>
       </v-row>
     </v-container>
@@ -47,18 +35,21 @@
 
 <script>
 import {mapActions, mapState} from 'vuex'
+import EpisodesCard from '@/components/EpisodesCard'
 
 export default {
   name: 'EpisodesPage',
+  components: {EpisodesCard},
   data() {
     return {
+      loading: false,
       page: 0
     }
   },
   computed: {
     ...mapState({
-      episodes: state => state.episodeStore.episodes,
-      episodesPages: state => state.episodeStore.episodesPages,
+      episodes: s => s.episodeStore.episodes,
+      episodesPages: s => s.episodeStore.episodesPages,
     })
   },
   created() {
@@ -75,9 +66,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      getEpisodes: 'episodeStore/getEpisodes'
-    })
+    ...mapActions('episodeStore', ['getEpisodes']),
   }
 }
 </script>
@@ -88,7 +77,4 @@ export default {
   flex-wrap: wrap;
 }
 
-.item {
-  width: 100%;
-}
 </style>

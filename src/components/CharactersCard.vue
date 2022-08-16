@@ -1,9 +1,6 @@
 <template>
   <v-card
-    max-width='500'
-    min-width='400'
     class='ma-5 pa-3'
-    outlined
     :loading='loading'
   >
     <v-list-item
@@ -36,29 +33,24 @@
         <div>Last known location:</div>
         <router-link
           class='link'
-          :to="{ name: 'LocationItemPage', params: { id: character.location.url.split('/').pop() } }"
+          :to="{ name: 'LocationItemPage', params: { id: +character.location.url.split('/').pop() } }"
         >
           {{ character.location.name }}
         </router-link>
         <v-list-item-subtitle></v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
-    <v-btn
-      icon
-      @click='onClick'
-      :color="btnActive ? 'pink': 'gray'"
-      class='btn-like'
-    >
-      <v-icon>mdi-heart</v-icon>
-    </v-btn>
+    <LikeButton :btn-active='btnActive' :on-click='onClick' />
   </v-card>
 </template>
 <script>
 
-import {mapMutations, mapState} from 'vuex'
+import {mapGetters, mapMutations, mapState} from 'vuex'
+import LikeButton from '@/components/LikeButton'
 
 export default {
   name: 'CharactersCard',
+  components: {LikeButton},
   props: {
     character: {
       type: Object,
@@ -68,34 +60,32 @@ export default {
   data() {
     return {
       loading: false,
-      btnActive: false
+      btnActive: this.character.isLiked
     }
   },
   computed: {
-    ...mapState({
-      charactersLikes: s => s.characterStore.charactersLikes
-    })
+    ...mapState('characterStore', ['likedCharacters']),
+    ...mapGetters('authStore', ['isLogged'])
   },
   watch: {
-    character: {
+    likedCharacters: {
       handler() {
-        console.log(this.character.isLiked)
         this.btnActive = this.character.isLiked
       },
-      deep: true,
-      
+      deep: true
     }
-  },
-  mounted() {
-    console.log(this.character)
   },
   methods: {
     ...mapMutations({
       SET_CHARACTER_LIKE: 'characterStore/SET_CHARACTER_LIKE',
-      REMOVE_LIKE: 'characterStore/REMOVE_LIKE'
+      REMOVE_CHARACTER_LIKE: 'characterStore/REMOVE_CHARACTER_LIKE'
     }),
     onClick() {
-      this.character.isLiked ? this.REMOVE_LIKE(this.character.id) : this.SET_CHARACTER_LIKE(this.character)
+      if (this.isLogged) {
+        this.character.isLiked ? this.REMOVE_CHARACTER_LIKE(this.character.id) : this.SET_CHARACTER_LIKE(this.character)
+      } else {
+        this.$router.push( {name: 'LoginPage'} )
+      }
     }
   }
 }
@@ -122,12 +112,6 @@ svg {
 
 .link:hover {
   color: orange;
-}
-
-.btn-like {
-  position: absolute;
-  top: 5px;
-  right: 5px;
 }
 
 </style>

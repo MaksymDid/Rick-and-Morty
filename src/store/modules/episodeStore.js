@@ -1,12 +1,13 @@
 import HTTP from '../../../http-common'
 
-const userStore = {
+export default {
   namespaced: true,
   state: {
     episodes: [],
     episodeItem: {},
     episodesById: [],
-    episodesPages: {}
+    episodesPages: {},
+    likedEpisodes: []
   },
   getters: {
     charactersID: ({episodeItem}) => {
@@ -16,11 +17,42 @@ const userStore = {
     }
   },
   mutations: {
-    SET_EPISODES: (state, episodes) => state.episodes = episodes.results,
+    SET_EPISODES: (state, episodes) => {
+      state.episodes = episodes
+      state.episodes.forEach(el => el.isLiked = false)
+      if (state.likedEpisodes.length) state.episodes.forEach(el => {
+        state.likedEpisodes.forEach(like => (el.id === like.id) && (el.isLiked = like.isLiked))
+      })
+    },
     SET_CLEAN_EPISODE: state => state.episodeItem = {},
-    SET_EPISODE: (state, episode) => state.episodeItem = episode,
+    SET_EPISODE: (state, episode) => {
+      state.episodeItem = {...episode, isLiked: false}
+      state.likedEpisodes.find( item => item.id === episode?.id ) && (state.episodeItem.isLiked = true)
+    },
     SET_EPISODES_BY_IDS: (state, characters) => state.episodesById = characters,
-    SET_EPISODES_PAGES: (state, pages) => state.episodesPages = pages
+    SET_EPISODES_PAGES: (state, pages) => state.episodesPages = pages,
+    SET_EPISODES_LIKE: (state, episode) => {
+      state.episodes.forEach(el => {
+        if (el.id === episode.id){
+          (el.isLiked = true)
+        }
+      })
+      if (Object.keys(state.episodeItem)?.length) {
+        state.episodeItem.isLiked = true
+      }
+      state.likedEpisodes.push(episode)
+    },
+    REMOVE_EPISODE_LIKE: (state, id) => {
+      state.episodes.forEach(el => {
+        if (el.id === id) {
+          (el.isLiked = false)
+        }
+      })
+      if (Object.keys(state.episodeItem)?.length) {
+        state.episodeItem.isLiked = false
+      }
+      state.likedEpisodes = state.likedEpisodes.filter(item => item.id !== id)
+    }
   },
   actions: {
     async getEpisodes({commit}, params = null) {
@@ -28,7 +60,7 @@ const userStore = {
         const res = await HTTP.get('episode', {
           params: params
         })
-        commit('SET_EPISODES', res.data)
+        commit('SET_EPISODES', res.data.results)
         if (!params) {
           commit('SET_COUNT_INFO', {name: 'Episode', count: res.data.info.count}, {root: true})
           commit('SET_EPISODES_PAGES', {pages: res.data.info.pages})
@@ -60,5 +92,3 @@ const userStore = {
     }
   }
 }
-
-export default userStore

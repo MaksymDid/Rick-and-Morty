@@ -3,34 +3,17 @@
     <v-container class='wrap lighten-5 pa-4'>
       <v-row>
         <v-col
+          cols='12'
+          md='6'
+          sm='12'
           v-for='location in locations'
           :key='location.id'
         >
-          <v-card
-            max-width='500'
-            min-width='400'
-            class='ma-5 item'
-            outlined
-          >
-            <v-list-item three-line>
-              <v-list-item-content>
-                <router-link class='link' :to="{ name: 'LocationItemPage', params: { id: location.id } }">
-                  <div class='text-h6 mb-1'>
-                    {{ location.name }}
-                  </div>
-                </router-link>
-                <div class='mb-2'>
-                  Type: {{ location.type }}
-                </div>
-                <div class='mb-2'>
-                  Dimension: {{ location.dimension }}
-                </div>
-                <div class='mb-2'>
-                  Created: {{ new Intl.DateTimeFormat('en-US').format(new Date(location.created)) }}
-                </div>
-              </v-list-item-content>
-            </v-list-item>
-          </v-card>
+          <v-skeleton-loader
+            v-if='loading'
+            type='card-heading, list-item-three-line'
+          ></v-skeleton-loader>
+          <LocationsCard v-else :location='location' />
         </v-col>
       </v-row>
     </v-container>
@@ -50,20 +33,21 @@
 
 <script>
 import {mapActions, mapState} from 'vuex'
+import LocationsCard from '@/components/LocationsCard'
 
 export default {
   name: 'LocationsPage',
+  components: {LocationsCard},
   data() {
-    return{
+    return {
       page: 0,
-      loading: false
+      loading: false,
     }
   },
   computed: {
-    ...mapState(
-      {
-        locations: state => state.locationStore.locations,
-        locationsPages: state => state.locationStore.locationsPages,
+    ...mapState({
+        locations: s => s.locationStore.locations,
+        locationsPages: s => s.locationStore.locationsPages,
       })
   },
   created() {
@@ -77,12 +61,10 @@ export default {
         this.loading = false
       },
       deep: true
-    }
+    },
   },
   methods: {
-    ...mapActions({
-      getLocations: 'locationStore/getLocations'
-    })
+    ...mapActions('locationStore', ['getLocations'])
   }
 }
 </script>
@@ -93,7 +75,4 @@ export default {
   flex-wrap: wrap;
 }
 
-.item {
-  width: 100%;
-}
 </style>

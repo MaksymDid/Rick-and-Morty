@@ -71,7 +71,6 @@
       </v-form>
     </v-card>
   </div>
-
 </template>
 
 <script>
@@ -97,19 +96,27 @@ export default {
       ]
     }
   },
-  computed: {
-    ...mapGetters({
-      checkUser: 'authStore/checkUser'
-    })
-  },
+  computed: mapGetters('authStore', ['checkUser']),
   methods: {
     ...mapMutations({
-      SET_USER: 'authStore/SET_USER'
+      SET_USER: 'authStore/SET_USER',
+      SET_SNACKBAR_PARAMS: 'snackbarStore/SET_SNACKBAR_PARAMS'
     }),
     async logIn() {
       if (this.checkUser(this.user)) {
         this.SET_USER(this.user)
        await this.$router.push( { name: 'OverviewPage' } )
+        this.SET_SNACKBAR_PARAMS({
+          isOpen: true,
+          color: 'success',
+          message: 'You have successfully logged in',
+        })
+      } else {
+        this.SET_SNACKBAR_PARAMS({
+          isOpen: true,
+          color: 'error',
+          message: 'Invalid email or password',
+        })
       }
     },
   }

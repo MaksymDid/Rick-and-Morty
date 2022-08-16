@@ -1,11 +1,25 @@
 <template>
-  <div>
-    <h1 class='text-center mb-3'>Registration</h1>
-    <v-card
-      elevation='2'
-      class='pa-2'
-      max-width='800'
-    >
+  <v-dialog
+    v-model='dialog'
+    persistent
+    max-width='800px'
+  >
+    <template #activator='{ on, attrs }'>
+      <v-btn
+        class='v-btn--absolute'
+        right
+        color='primary'
+        fab
+        small
+        dark
+        v-bind='attrs'
+        v-on='on'
+        @click='isConfirmPassword = false'
+      >
+        <v-icon>mdi-pencil</v-icon>
+      </v-btn>
+    </template>
+    <v-card class='pa-4'>
       <v-form
         ref='form2'
         v-model='isValid'
@@ -13,6 +27,41 @@
         @submit.prevent='submitUser'
       >
         <v-row class='ma-0'>
+          <v-col
+            cols='12'
+            class='pa-2'
+            md='12'
+            sm='12'
+            xs='12'
+          >
+            <div class='avatar'>
+              <v-avatar
+                color='pink'
+                class='mb-3'
+                size='100'
+              >
+                <img
+                  v-if='imgSrc'
+                  :src='imgSrc'
+                  alt=' '
+                >
+                <span
+                  v-else
+                  class='white--text text-h4'
+                >
+            {{ initials }}
+          </span>
+              </v-avatar>
+              <div class='upload-photo'>
+                <v-file-input
+                  v-model='img'
+                  accept='image/png, image/jpeg, image/bmp'
+                  hide-input
+                  prepend-icon='mdi-pencil'
+                ></v-file-input>
+              </div>
+            </div>
+          </v-col>
           <v-col
             cols='12'
             class='pa-2'
@@ -24,11 +73,11 @@
               First name
             </v-card-title>
             <v-text-field
-              v-model='user.firstName'
+              v-model='editedUser.firstName'
               outlined
+              :rules='emptyRule'
               label='First name'
               required
-              :rules='emptyRule'
             ></v-text-field>
           </v-col>
           <v-col
@@ -42,11 +91,11 @@
               Last name
             </v-card-title>
             <v-text-field
-              v-model='user.lastName'
+              v-model='editedUser.lastName'
               outlined
+              :rules='emptyRule'
               label='First name'
               required
-              :rules='emptyRule'
             ></v-text-field>
           </v-col>
           <v-col
@@ -60,12 +109,12 @@
               Phone number
             </v-card-title>
             <v-text-field
-              v-model='user.phone'
+              v-model='editedUser.phone'
               outlined
               label='Phone number'
               required
-              v-mask="'+380-##-###-##-##'"
               :rules='emptyRule'
+              v-mask="'+380-##-###-##-##'"
             ></v-text-field>
           </v-col>
           <v-col
@@ -79,7 +128,7 @@
               ref='menu'
               v-model='menu'
               :close-on-content-click='false'
-              :return-value.sync='user.date'
+              :return-value.sync='editedUser.date'
               transition='scale-transition'
               offset-y
               min-width='auto'
@@ -89,18 +138,18 @@
                   Birth date
                 </v-card-title>
                 <v-text-field
-                  v-model='user.date'
+                  v-model='currentUser.date'
                   outlined
                   label='Birth date'
                   required
+                  :rules='emptyRule'
                   append-icon='mdi-calendar'
                   v-bind='attrs'
                   v-on='on'
-                  :rules='emptyRule'
                 ></v-text-field>
               </template>
               <v-date-picker
-                v-model='user.date'
+                v-model='currentUser.date'
                 no-title
                 scrollable
               >
@@ -115,31 +164,12 @@
                 <v-btn
                   text
                   color='primary'
-                  @click='$refs.menu.save(user.date)'
+                  @click='$refs.menu.save(currentUser.date)'
                 >
                   OK
                 </v-btn>
               </v-date-picker>
             </v-menu>
-          </v-col>
-          <v-col
-            cols='12'
-            class='pa-2'
-            md='12'
-            sm='12'
-            xs='12'
-          >
-            <v-card-title class='pa-0 mb-3'>
-              Email
-            </v-card-title>
-            <v-text-field
-              v-model='user.email'
-              label='Email'
-              type='email'
-              outlined
-              :rules='emailRules'
-              required
-            ></v-text-field>
           </v-col>
           <v-col
             cols='12'
@@ -152,9 +182,10 @@
               Password
             </v-card-title>
             <v-text-field
-              v-model='user.password'
+              v-model='editedUser.password'
               label='Password'
               type='password'
+              @focus='focus'
               outlined
               :rules='passwordRules'
               required
@@ -165,6 +196,7 @@
             ></v-text-field>
           </v-col>
           <v-col
+            v-if='isConfirmPassword'
             cols='12'
             class='pa-2'
             md='6'
@@ -178,8 +210,9 @@
               label='Confirm password'
               type='password'
               outlined
-              :rules='confirmPasswordRules'
+              v-model='confirmPassword'
               required
+              :rules='confirmPasswordRules'
               :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
               :type="show2 ? 'text' : 'password'"
               hint='At least 8 characters'
@@ -187,57 +220,43 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-row
-          justify='space-between'
-          class='ma-0'
-        >
+        <v-card-actions class='justify-space-between'>
           <v-btn
             color='primary'
-            plain
-            :to="{ name: 'LoginPage' }"
+            @click='cancel'
           >
-            have account?
+            Cancel
           </v-btn>
           <v-btn
-            width='150'
             color='primary'
             type='submit'
           >
             Submit
           </v-btn>
-        </v-row>
+        </v-card-actions>
       </v-form>
     </v-card>
-  </div>
+  </v-dialog>
 </template>
-
 <script>
-import {mapGetters, mapMutations} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 
 export default {
-  name: 'RegistrationPage',
+  name: 'EditUserDialogComponent',
   data() {
     return {
-      user: {
-        firstName: '',
-        lastName: '',
-        phone: '',
-        date: '',
-        email: '',
-        password: '',
-        imgSrc: ''
-      },
-      isValid: true,
       menu: false,
       modal: false,
       show1: false,
       show2: false,
+      dialog: false,
+      isValid: true,
+      isConfirmPassword: false,
+      confirmPassword: '',
+      img: null,
+      imgSrc: '',
       emptyRule: [
         v => !!v || 'Field is required'
-      ],
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+/.test(v) || 'E-mail must be valid'
       ],
       passwordRules: [
         v => !!v || 'Password is required',
@@ -245,39 +264,95 @@ export default {
       ],
       confirmPasswordRules: [
         v => !!v || 'Confirm password is required',
-        v => v === this.user.password || 'Invalid password'
-      ]
+        v => v === this.editedUser.password || 'Invalid password'
+      ],
+      editedUser: {}
     }
   },
-  computed: mapGetters('authStore', ['checkUserRegistration']),
+  computed: {
+    ...mapState('authStore', ['currentUser']),
+    initials() {
+      return this.currentUser.firstName.slice(0, 1) + this.currentUser.lastName.slice(0, 1)
+    },
+    fullName() {
+      return this.currentUser.firstName + ' ' + this.currentUser.lastName
+    }
+  },
+  created() {
+    this.editedUser = {...this.currentUser}
+    this.imgSrc = this.currentUser.imgSrc
+  },
   methods: {
     ...mapMutations({
-      SET_USERS: 'authStore/SET_USERS',
+      EDIT_USER: 'authStore/EDIT_USER',
       SET_SNACKBAR_PARAMS: 'snackbarStore/SET_SNACKBAR_PARAMS'
     }),
-    async submitUser() {
+    submitUser() {
       this.isValid = this.$refs.form2.validate()
-      if (this.isValid && !this.checkUserRegistration(this.user.email)) {
-        this.SET_USERS(this.user)
-        await this.$router.push({name: 'LoginPage'})
+      if (this.isValid) {
+        this.EDIT_USER({...this.editedUser, imgSrc: this.imgSrc})
+        this.dialog = false
         this.SET_SNACKBAR_PARAMS({
           isOpen: true,
           color: 'success',
-          message: 'Account successfully registered',
-        })
-      } else if (this.isValid && this.checkUserRegistration(this.user.email)){
-        this.SET_SNACKBAR_PARAMS({
-          isOpen: true,
-          color: 'error',
-          message: 'An account with this email already exists',
+          message: 'Data is changed successfully'
         })
       }
     },
+    cancel() {
+      this.editedUser = {...this.currentUser}
+      this.imgSrc = this.currentUser.imgSrc
+      this.confirmPassword = ''
+      this.isConfirmPassword = false
+      this.dialog = false
+      this.img = null
+    },
+    focus() {
+      this.isConfirmPassword = true
+    },
+    uploadPhoto(img) {
+      const reader = new FileReader()
+      reader.addEventListener('load', () => {
+        this.imgSrc = reader.result
+      })
+      reader.readAsDataURL(img)
+    }
+  },
+  watch: {
+    img() {
+      if (this.img) {
+        this.uploadPhoto(this.img)
+      }
+
+    }
   }
 }
 </script>
+<style lang='scss'>
+.avatar {
+  position: relative;
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
 
-<style scoped>
+  .upload-photo {
+    position: absolute;
+    bottom: 15px;
+    left: 65px;
+    border-radius: 50%;
+    background-color: cornflowerblue;
+
+    .v-text-field {
+      padding: 0;
+      margin: 0;
+    }
+
+    .v-input__prepend-outer {
+      margin: 0;
+      padding: 5px;
+    }
+  }
+}
 .v-card__title {
   font-size: 1rem !important;
   line-height: 1rem !important;

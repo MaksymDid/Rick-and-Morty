@@ -6,6 +6,7 @@ import characterStore from '@/store/modules/characterStore'
 import locationStore from '@/store/modules/locationStore'
 import episodeStore from '@/store/modules/episodeStore'
 import authStore from '@/store/modules/authStore'
+import snackbarStore from '@/store/modules/snackbarStore'
 
 Vue.use(Vuex)
 
@@ -35,6 +36,7 @@ export default new Vuex.Store({
     characterStore,
     locationStore,
     episodeStore,
-    authStore
+    authStore,
+    snackbarStore
   }
 })

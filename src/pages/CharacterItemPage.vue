@@ -1,8 +1,6 @@
 <template>
   <v-card
     class='ma-2'
-    outlined
-    :loading='loading'
   >
     <v-list-item three-line v-if='!loading'>
       <v-img
@@ -24,7 +22,10 @@
           Origin: {{ characterItem.origin.name }}
         </div>
         <div class='mb-1'>Last known location:
-          <router-link class='link' :to="{ name: 'LocationItemPage', params: { id: url } }">
+          <router-link
+            class='link'
+            :to="{ name: 'LocationItemPage', params: { id: +characterItem.location.url.split('/').pop() } }"
+          >
             {{ characterItem.location.name }}
           </router-link>
         </div>
@@ -41,31 +42,32 @@
           </template>
         </div>
         <div class='mb-1'>Created: {{ characterItem.created }}</div>
-        <v-list-item-subtitle></v-list-item-subtitle>
       </v-list-item-content>
     </v-list-item>
+    <LikeButton :btn-active='btnActive' :on-click='onClick' />
   </v-card>
 </template>
 
 <script>
 import {mapActions, mapGetters, mapMutations, mapState} from 'vuex'
+import LikeButton from '@/components/LikeButton'
 
 export default {
   name: 'CharacterItemPage',
+  data() {
+    return {
+      loading: true,
+      btnActive: false
+    }
+  },
+  components: {LikeButton},
   computed: {
     ...mapState({
       characterItem: s => s.characterStore.characterItem,
-      episodesById: s => s.episodeStore.episodesById
+      episodesById: s => s.episodeStore.episodesById,
+      likedCharacters: s => s.characterStore.likedCharacters
     }),
-    ...mapGetters('characterStore', ['episodesID']),
-    url() {
-      return this.characterItem.location.url.split('/').pop()
-    }
-  },
-  data() {
-    return {
-      loading: true
-    }
+    ...mapGetters('characterStore', ['episodesID'])
   },
   watch: {
     $route: {
@@ -73,10 +75,17 @@ export default {
         this.loading = true
         await this.getCharacter(this.$route.params.id)
         await this.getEpisodeByIds(this.episodesID)
+        this.btnActive = this.characterItem.isLiked
         this.loading = false
       },
       deep: true,
       immediate: true
+    },
+    likedCharacters: {
+      handler() {
+        this.btnActive = this.characterItem.isLiked
+      },
+      deep: true
     }
   },
   beforeDestroy() {
@@ -84,16 +93,20 @@ export default {
   },
   methods: {
     ...mapMutations({
-      SET_CHARACTER: 'characterStore/SET_CHARACTER'
+      SET_CHARACTER: 'characterStore/SET_CHARACTER',
+      SET_CHARACTER_LIKE: 'characterStore/SET_CHARACTER_LIKE',
+      REMOVE_CHARACTER_LIKE: 'characterStore/REMOVE_CHARACTER_LIKE'
     }),
     ...mapActions({
       getCharacter: 'characterStore/getCharacter',
       getEpisodeByIds: 'episodeStore/getEpisodeByIds'
-    })
+    }),
+    onClick() {
+      this.characterItem.isLiked ? this.REMOVE_CHARACTER_LIKE(this.characterItem.id) : this.SET_CHARACTER_LIKE(this.characterItem)
+    }
   }
 }
 </script>
 
 <style scoped>
-
 </style>

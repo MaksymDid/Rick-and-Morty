@@ -6,13 +6,13 @@
   </div>
 </template>
 <script>
-import {mapState} from 'vuex'
+import { mapState} from 'vuex'
 
 export default {
   name: 'AllInfo',
   computed: {
     ...mapState(['allCountInfo']),
-  },
+  }
 }
 </script>
 <style scoped>
@@ -36,8 +36,10 @@ svg {
 }
 
 .wrap_info {
+  margin-top: 20px;
   color: white;
   padding: 70px 0;
+  background: rgb(32, 35, 41);
 }
 
 </style>

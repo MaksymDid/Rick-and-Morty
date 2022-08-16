@@ -2,8 +2,6 @@
   <div>
     <v-card
       class='ma-2'
-      outlined
-      :loading='loading'
     >
       <v-list-item three-line v-if='!loading'>
         <v-list-item-content>
@@ -21,23 +19,20 @@
             Created: {{ locationItem.created }}
           </div>
           <h3 class='text-center'>Residents:</h3>
-          <template
-            v-if='charactersById.length > 1'
-          >
             <v-row ref='wrapper' @scroll='loadMore'>
               <v-col
-                v-for='character in charactersById'
+                cols='12'
+                md='6'
+                sm='12'
+                v-for='character in characters'
                 :key='character.id'
               >
                 <CharactersCard :character='character' />
               </v-col>
             </v-row>
-          </template>
-          <template v-else>
-            <CharactersCard :character='charactersById' />
-          </template>
         </v-list-item-content>
       </v-list-item>
+      <LikeButton :btn-active='btnActive' :on-click='onClick' />
     </v-card>
   </div>
 </template>
@@ -45,20 +40,23 @@
 <script>
 import {mapActions, mapState, mapGetters, mapMutations} from 'vuex'
 import CharactersCard from '@/components/CharactersCard'
+import LikeButton from '@/components/LikeButton'
 
 export default {
   name: 'EpisodesPage',
-  components: {CharactersCard},
+  components: {CharactersCard, LikeButton},
   data() {
     return {
       loading: false,
-      slice: 6
+      slice: 6,
+      btnActive: false
     }
   },
   computed: {
     ...mapState({
-      locationItem: state => state.locationStore.locationItem,
-      charactersById: state => state.characterStore.charactersById
+      locationItem: s => s.locationStore.locationItem,
+      characters: s => s.characterStore.characters,
+      likedLocations: s => s.locationStore.likedLocations
     }),
     ...mapGetters('locationStore', ['charactersID'])
   },
@@ -67,16 +65,24 @@ export default {
       async handler() {
         this.loading = true
         await this.getLocation(this.$route.params.id)
+        this.CLEAR_CHARACTER_BY_IDS({})
         await this.getCharactersByIds(this.charactersID.slice(0, this.slice).join(','))
+        this.btnActive = this.locationItem.isLiked
         this.loading = false
       },
       deep: true,
       immediate: true
     },
     async slice() {
-      if (this.charactersID.length >= this.slice-6) {
+      if (this.charactersID.length > this.slice-6) {
         await this.getCharactersByIds(this.charactersID.slice(this.slice - 6, this.slice).join(','))
       }
+    },
+    likedLocations: {
+      handler() {
+        this.btnActive = this.locationItem.isLiked
+      },
+      deep: true
     }
   },
   mounted() {
@@ -85,7 +91,7 @@ export default {
   beforeDestroy() {
     this.SET_LOCATION({})
     document.removeEventListener('scroll', this.loadMore)
-    this.CLEAR_CHARACTER_BY_IDS([])
+    this.CLEAR_CHARACTER_BY_IDS({})
   },
   methods: {
     ...mapActions({
@@ -94,16 +100,26 @@ export default {
     }),
     ...mapMutations({
       SET_LOCATION: 'locationStore/SET_LOCATION',
-      CLEAR_CHARACTER_BY_IDS: 'characterStore/CLEAR_CHARACTER_BY_IDS'
+      CLEAR_CHARACTER_BY_IDS: 'characterStore/CLEAR_CHARACTER_BY_IDS',
+      SET_LOCATIONS_LIKE: 'locationStore/SET_LOCATIONS_LIKE',
+      REMOVE_LOCATION_LIKE: 'locationStore/REMOVE_LOCATION_LIKE'
     }),
     loadMore() {
-      if (this.$refs.wrapper.getBoundingClientRect().bottom < document.documentElement.clientHeight - 8) {
+      if (this.$refs.wrapper.getBoundingClientRect().bottom < document.documentElement.clientHeight + 10) {
         this.slice += 6
       }
+    },
+    onClick() {
+      this.locationItem.isLiked ? this.REMOVE_LOCATION_LIKE(this.locationItem.id) : this.SET_LOCATIONS_LIKE(this.locationItem)
     }
   }
 }
 </script>
 
 <style scoped>
+.btn-like {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
 </style>

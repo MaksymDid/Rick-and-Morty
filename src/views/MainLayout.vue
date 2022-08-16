@@ -1,19 +1,15 @@
 <template>
   <div>
     <v-navigation-drawer
-      v-model='drawer'
+      v-model='sidebarOpen'
       app
     >
-      <SidebarMenu />
+      <SidebarMenu v-if='isLogged' />
     </v-navigation-drawer>
-
-    <v-app-bar app>
-      <v-app-bar-nav-icon @click='drawer = !drawer'></v-app-bar-nav-icon>
-
-      <v-toolbar-title class='ma-auto name'>{{ this.$route.path.slice(1) || namePage }}
-      </v-toolbar-title>
-    </v-app-bar>
-
+    <HeaderComponent
+      :sidebarOpen='sidebarOpen'
+      @isSidebarOpen='isSidebarOpen'
+/>
     <v-main>
       <router-view />
     </v-main>
@@ -22,21 +18,30 @@
 
 <script>
 import SidebarMenu from '@/components/SidebarMenu'
+import {mapGetters} from 'vuex'
+import HeaderComponent from '@/components/HeaderComponent'
 
 export default {
   name: 'MainLayout',
-  components: {SidebarMenu},
+  components: {HeaderComponent, SidebarMenu},
   data() {
     return {
-      drawer: null,
-      namePage: 'The Rick and Morty API'
+      sidebarOpen: false,
+    }
+  },
+  computed: {
+    ...mapGetters('authStore', ['isLogged']),
+  },
+  created() {
+    if (this.isLogged) {
+      this.sidebarOpen = true
+    }
+  },
+  methods:{
+    isSidebarOpen(){
+      this.sidebarOpen = !this.sidebarOpen
     }
   }
 }
 </script>
 
-<style scoped>
-.name {
-  text-transform: capitalize;
-}
-</style>
