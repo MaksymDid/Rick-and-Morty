@@ -85,10 +85,28 @@ export default {
 }
 
 h1 {
-  font-size: 75px;
-  padding: 100px 0;
+  font-size: 45px;
+  padding: 50px 0;
   text-align: center;
   z-index: 0;
+}
+
+@media (min-width: 600px) {
+  h1 {
+    font-size: 65px;
+    padding: 70px 0;
+    text-align: center;
+    z-index: 0;
+  }
+}
+
+@media (min-width: 960px) {
+  h1 {
+    font-size: 75px;
+    padding: 100px 0;
+    text-align: center;
+    z-index: 0;
+  }
 }
 
 svg {

@@ -26,7 +26,15 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+.link{
+  color: black !important;
+  text-decoration: none!important;
+}
+
+.link:hover{
+  color: orange !important;
+}
 
 </style>
 

@@ -5,7 +5,6 @@ export default {
   state: {
     episodes: [],
     episodeItem: {},
-    episodesById: [],
     episodesPages: {},
     likedEpisodes: []
   },
@@ -29,7 +28,32 @@ export default {
       state.episodeItem = {...episode, isLiked: false}
       state.likedEpisodes.find( item => item.id === episode?.id ) && (state.episodeItem.isLiked = true)
     },
-    SET_EPISODES_BY_IDS: (state, characters) => state.episodesById = characters,
+    SET_EPISODES_BY_IDS: (state, episodes) => {
+      if (state.episodes.length && Array.isArray(episodes)) {
+        state.episodes.push(...episodes)
+        state.episodes.forEach(el => el.isLiked = false)
+        if (state.likedEpisodes.length) state.characters.forEach(el => {
+          state.likedEpisodes.forEach(like => (el.id === like.id) && (el.isLiked = like.isLiked))
+        })
+      } else if (state.episodes.length && !Array.isArray(episodes)) {
+        state.episodes.push(episodes)
+        state.episodes.forEach(el => el.isLiked = false)
+        if (state.likedEpisodes.length) state.episodes.forEach(el => {
+          state.likedEpisodes.forEach(like => (el.id === like.id) && (el.isLiked = like.isLiked))
+        })
+      } else if (!state.episodes.length && !Array.isArray(episodes)) {
+        state.episodes = [episodes]
+        state.episodes.forEach(el => el.isLiked = false)
+        if (state.likedEpisodes.length) state.episodes.forEach(el => {
+          state.likedEpisodes.forEach(like => (el.id === like.id) && (el.isLiked = like.isLiked))
+        })
+      } else state.episodes = episodes
+      state.episodes.forEach(el => el.isLiked = false)
+      if (state.likedEpisodes.length) state.episodes.forEach(el => {
+        state.likedEpisodes.forEach(like => (el.id === like.id) && (el.isLiked = like.isLiked))
+      })
+    },
+    CLEAR_EPISODES_BY_IDS: state => state.episodes = [],
     SET_EPISODES_PAGES: (state, pages) => state.episodesPages = pages,
     SET_EPISODES_LIKE: (state, episode) => {
       state.episodes.forEach(el => {
@@ -52,7 +76,8 @@ export default {
         state.episodeItem.isLiked = false
       }
       state.likedEpisodes = state.likedEpisodes.filter(item => item.id !== id)
-    }
+    },
+    CLEAR_EPISODE_LIKE: state => state.likedEpisodes = [],
   },
   actions: {
     async getEpisodes({commit}, params = null) {

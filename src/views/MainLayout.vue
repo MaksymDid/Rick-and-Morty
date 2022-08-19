@@ -34,7 +34,7 @@ export default {
   },
   created() {
     if (this.isLogged) {
-      this.sidebarOpen = true
+      this.sidebarOpen = false
     }
   },
   methods:{

@@ -1,5 +1,4 @@
 <template>
-  <div>
     <v-container class='wrap lighten-5 pa-4'>
       <v-row>
         <v-col
@@ -8,6 +7,7 @@
           sm='12'
           v-for='location in locations'
           :key='location.id'
+          class='pa-0'
         >
           <v-skeleton-loader
             v-if='loading'
@@ -16,19 +16,23 @@
           <LocationsCard v-else :location='location' />
         </v-col>
       </v-row>
-    </v-container>
-    <v-row justify='center'>
-      <v-col cols='8'>
+    <v-row
+      justify='center'
+      width='100%'
+      v-if='!loading'
+    >
+      <v-col cols='10'>
         <v-container class='max-width'>
           <v-pagination
             v-model='page'
+            :total-visible='7'
             class='my-3'
             :length='this.locationsPages.pages'
           ></v-pagination>
         </v-container>
       </v-col>
     </v-row>
-  </div>
+    </v-container>
 </template>
 
 <script>
@@ -41,14 +45,14 @@ export default {
   data() {
     return {
       page: 0,
-      loading: false,
+      loading: false
     }
   },
   computed: {
     ...mapState({
-        locations: s => s.locationStore.locations,
-        locationsPages: s => s.locationStore.locationsPages,
-      })
+      locations: s => s.locationStore.locations,
+      locationsPages: s => s.locationStore.locationsPages
+    })
   },
   created() {
     this.page = 1
@@ -61,7 +65,7 @@ export default {
         this.loading = false
       },
       deep: true
-    },
+    }
   },
   methods: {
     ...mapActions('locationStore', ['getLocations'])

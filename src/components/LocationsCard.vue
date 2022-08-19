@@ -1,7 +1,6 @@
 <template>
   <v-card
-    class='ma-5 '
-    outlined
+    class='ma-2 my-5 ma-sm-5 pa-1 pa-sm-3'
   >
     <v-list-item three-line>
       <v-list-item-content>
@@ -31,13 +30,13 @@ import LikeButton from '@/components/LikeButton'
 export default {
   name: 'LocationsCard',
   components: {LikeButton},
-  data () {
-    return{
+  data() {
+    return {
       btnActive: this.location.isLiked
     }
   },
   props: {
-    location: {},
+    location: {}
   },
   computed: mapState('locationStore', ['likedLocations']),
   watch: {
@@ -59,5 +58,5 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style>
 </style>

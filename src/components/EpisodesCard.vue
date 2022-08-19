@@ -1,7 +1,6 @@
 <template>
   <v-card
-    class='ma-5'
-    outlined
+    class='ma-2 my-5 ma-sm-5 pa-1 pa-sm-3'
   >
     <v-list-item three-line>
       <v-list-item-content>

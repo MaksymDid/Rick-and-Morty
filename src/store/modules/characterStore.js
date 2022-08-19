@@ -1,5 +1,6 @@
 import HTTP from '../../../http-common'
 import router from '@/router'
+import loginPage from '@/pages/LoginPage'
 
 export default {
   namespaced: true,
@@ -8,13 +9,13 @@ export default {
     characterItem: {},
     charactersPages: {},
     charactersCount: '',
-    likedCharacters: []
+    likedCharacters: [],
   },
   getters: {
     episodesID: ({characterItem}) => {
       return characterItem.episode.map(item => {
         return item.split('/').pop()
-      }).join(',')
+      })
     }
   },
   mutations: {
@@ -29,7 +30,7 @@ export default {
       character?.id
         ? state.characterItem = {...character, created: character.created.slice(0, 10), isLiked: false}
         : state.characterItem = {}
-      state.likedCharacters.find( item => item.id === character?.id ) && (state.characterItem.isLiked = true)
+      state.likedCharacters.find(item => item.id === character?.id) && (state.characterItem.isLiked = true)
     },
     SET_CHARACTER_BY_IDS: (state, characters) => {
       if (state.characters.length && Array.isArray(characters)) {
@@ -56,12 +57,12 @@ export default {
         state.likedCharacters.forEach(like => (el.id === like.id) && (el.isLiked = like.isLiked))
       })
     },
-    CLEAR_CHARACTER_BY_IDS: (state, characters) => state.characters = characters,
+    CLEAR_CHARACTER_BY_IDS: state => state.characters = [],
     SET_CHARACTERS_PAGES: (state, pages) => state.charactersPages = pages,
     SET_CHARACTERS_COUNT: (state, count) => state.charactersCount = count,
     SET_CHARACTER_LIKE: (state, character) => {
       state.characters.forEach(el => {
-        if (el.id === character.id){
+        if (el.id === character.id) {
           (el.isLiked = true)
         }
       })
@@ -80,7 +81,8 @@ export default {
         state.characterItem.isLiked = false
       }
       state.likedCharacters = state.likedCharacters.filter(item => item.id !== id)
-    }
+    },
+    CLEAR_CHARACTER_LIKE: state => state.likedCharacters = [],
   },
   actions: {
     async getCharacters({commit}, params = null) {

@@ -7,7 +7,10 @@
     <v-toolbar-title class='ma-auto name'>
       {{ this.$route.path.slice(1) || namePage }}
     </v-toolbar-title>
-    <div v-if='isLogged'>
+    <div
+      v-if='isLogged'
+      class='pl-6 pl-sm-4'
+    >
       <v-row justify='center'>
         <v-menu
           bottom
@@ -120,9 +123,17 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('authStore', ['LOG_OUT']),
+    ...mapMutations({
+      LOG_OUT: 'authStore/LOG_OUT',
+      CLEAR_CHARACTER_LIKE: 'characterStore/CLEAR_CHARACTER_LIKE',
+      CLEAR_LOCATION_LIKE: 'locationStore/CLEAR_LOCATION_LIKE',
+      CLEAR_EPISODE_LIKE: 'episodeStore/CLEAR_EPISODE_LIKE'
+    }),
     logOut() {
       this.LOG_OUT()
+      this.CLEAR_CHARACTER_LIKE()
+      this.CLEAR_LOCATION_LIKE()
+      this.CLEAR_EPISODE_LIKE()
       this.$router.push({name: 'LoginPage'})
     }
   }

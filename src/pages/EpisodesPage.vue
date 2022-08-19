@@ -1,11 +1,11 @@
 <template>
-  <div>
     <v-container class='wrap lighten-5 pa-4'>
       <v-row>
         <v-col
           cols='12'
           md='6'
           sm='12'
+          class='pa-0'
           v-for='episode in episodes'
           :key='episode.id'
         >
@@ -18,19 +18,19 @@
           <EpisodesCard v-else :episode='episode' />
         </v-col>
       </v-row>
-    </v-container>
     <v-row justify='center'>
-      <v-col cols='8'>
+      <v-col cols='10'>
         <v-container class='max-width'>
           <v-pagination
             v-model='page'
+            :total-visible='7'
             class='my-3'
             :length='this.episodesPages.pages'
           ></v-pagination>
         </v-container>
       </v-col>
     </v-row>
-  </div>
+    </v-container>
 </template>
 
 <script>

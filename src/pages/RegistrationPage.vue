@@ -12,10 +12,10 @@
         lazy-validation
         @submit.prevent='submitUser'
       >
-        <v-row class='ma-0'>
+        <v-row class='ma-0' no-gutters>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='6'
             sm='6'
             xs='6'
@@ -33,7 +33,7 @@
           </v-col>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='6'
             sm='6'
             xs='6'
@@ -51,7 +51,7 @@
           </v-col>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='6'
             sm='6'
             xs='6'
@@ -70,7 +70,7 @@
           </v-col>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='6'
             sm='6'
             xs='6'
@@ -124,7 +124,7 @@
           </v-col>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='12'
             sm='12'
             xs='12'
@@ -143,7 +143,7 @@
           </v-col>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='6'
             sm='6'
             xs='6'
@@ -166,7 +166,7 @@
           </v-col>
           <v-col
             cols='12'
-            class='pa-2'
+            class='pa-sm-2'
             md='6'
             sm='6'
             xs='6'

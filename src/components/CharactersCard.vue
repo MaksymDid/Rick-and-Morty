@@ -1,45 +1,50 @@
 <template>
   <v-card
-    class='ma-5 pa-3'
+    class='ma-2 my-5 ma-sm-3 pa-0 pa-sm-3'
     :loading='loading'
   >
-    <v-list-item
-      class='px-0'
-      three-line
+    <div
+      class='px-0 d-flex flex-column flex-sm-row pb-0'
     >
       <router-link
-        class='link'
+        class='img-link'
         :to="{ name: 'CharacterItemPage', params: { id: character.id } }"
       >
         <v-img
-          max-width='170'
-          max-height='170'
-          class='mr-4 img'
+          class='mr-0 mr-sm-4 img'
           :src='character.image'
         ></v-img>
       </router-link>
-      <v-list-item-content>
+      <v-list-item-content
+        class='px-4 px-sm-0'
+      >
         <router-link
-          class='link'
+          class='text-h6 mb-4 link'
           :to="{ name: 'CharacterItemPage', params: { id: character.id } }"
         >
-          <div class='text-h6 link'>
-            {{ character.name }}
-          </div>
+          {{ character.name }}
         </router-link>
-        <div class='mb-2'>
-          {{ character.status }} - {{ character.species }}
+        <div class='mb-3 d-flex align-start'>
+          <v-icon
+            class='mr-2'
+            :color='color'
+            small
+          >mdi-brightness-1
+          </v-icon>
+          <div>
+            {{ character.status }} - {{ character.species }}
+          </div>
         </div>
-        <div>Last known location:</div>
+        <div class='mb-2'>Last known location:</div>
         <router-link
           class='link'
           :to="{ name: 'LocationItemPage', params: { id: +character.location.url.split('/').pop() } }"
+          active-class='mb-3'
         >
           {{ character.location.name }}
         </router-link>
-        <v-list-item-subtitle></v-list-item-subtitle>
       </v-list-item-content>
-    </v-list-item>
+    </div>
     <LikeButton :btn-active='btnActive' :on-click='onClick' />
   </v-card>
 </template>
@@ -65,7 +70,17 @@ export default {
   },
   computed: {
     ...mapState('characterStore', ['likedCharacters']),
-    ...mapGetters('authStore', ['isLogged'])
+    ...mapGetters('authStore', ['isLogged']),
+    color() {
+      switch (this.character.status) {
+        case 'unknown':
+          return 'gray'
+        case 'Alive' :
+          return 'green'
+        case 'Dead' :
+          return 'red'
+      }
+    }
   },
   watch: {
     likedCharacters: {
@@ -84,34 +99,31 @@ export default {
       if (this.isLogged) {
         this.character.isLiked ? this.REMOVE_CHARACTER_LIKE(this.character.id) : this.SET_CHARACTER_LIKE(this.character)
       } else {
-        this.$router.push( {name: 'LoginPage'} )
+        this.$router.push({name: 'LoginPage'})
       }
     }
   }
 }
 </script>
 <style scoped>
-
-h1 {
-  font-size: 75px;
-  padding: 100px 0;
-  text-align: center;
-  z-index: 0;
+.img {
+  width: 100% !important;
+  height: auto;
 }
 
-svg {
-  width: auto;
-  height: 75%;
-  fill: rgb(245, 245, 245);
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translate(-50%, 0);
-  z-index: -1;
+.img-link {
+  width: 100% !important;
 }
 
-.link:hover {
-  color: orange;
+@media (min-width: 600px) {
+  .img {
+    max-width: 170px;
+    max-height: 170px;
+  }
+
+  .img-link {
+    width: auto !important;
+  }
 }
 
 </style>

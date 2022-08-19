@@ -1,5 +1,5 @@
 <template>
-  <v-card class='ma-3 mt-5'>
+  <v-card class='mx-1 my-3 ma-sm-3 pa-2 pa-sm-6'>
     <v-tabs
       v-model='activeTab'
       color='deep-purple accent-4'
@@ -7,18 +7,18 @@
     >
       <v-tab>Characters</v-tab>
       <v-tab>Locations</v-tab>
-      <v-tab class='mr-3'>Episodes</v-tab>
+      <v-tab class='mr-0 mr-sm-3'>Episodes</v-tab>
       <v-tabs-items v-model='activeTab'>
         <v-tab-item
           v-for='n in 3'
           :key='n'
         >
           <v-container fluid>
-            <v-card-title class='text-h4 mb-2 pt-1'>
-              {{cardTitle}}
+            <v-card-title class='text-h4 mb-2 pt-4 pt-sm-1'>
+              {{ cardTitle }}
               <v-spacer></v-spacer>
               <v-text-field
-                class='mt-0 pt-0'
+                class='mt-3 mt-sm-0 pt-3 pt-sm-0'
                 v-model='search'
                 append-icon='mdi-magnify'
                 label='Search'
@@ -30,15 +30,12 @@
               v-model='selected'
               :headers='header'
               :items='item'
-              :search="search"
+              :search='search'
               item-key='name'
               show-select
               class='elevation-1'
               single-select
             >
-              <template #item.created={item}>
-                {{ item.created.slice(0, 10) }}
-              </template>
               <template #item.data-table-select={item}>
                 <v-btn
                   icon
@@ -49,6 +46,45 @@
                   <v-icon>mdi-heart</v-icon>
                 </v-btn>
               </template>
+              <template #item.image={item}>
+                <v-avatar>
+                  <img
+                    :src='item.image'
+                    alt=""
+                  >
+                </v-avatar>
+              </template>
+              <template #item.name={item}>
+                <router-link
+                  class='link'
+                  :to='{ name: `${link}`, params: { id: item.id } }'
+                >
+                  {{ item.name }}
+                </router-link>
+              </template>
+              <template #item.origin={item}>
+                <router-link
+                  v-if='item.origin.url'
+                  class='link'
+                  :to="{ name: 'LocationItemPage', params: { id: +item.origin.url.split('/').pop() } }"
+                >
+                  {{ item.origin.name }}
+                </router-link>
+                <template v-else>
+                  {{ item.origin.name }}
+                </template>
+              </template>
+              <template #item.location={item}>
+                <router-link
+                  class='link'
+                  :to="{ name: 'LocationItemPage', params: { id: +item.location.url.split('/').pop() } }"
+                >
+                  {{ item.location.name }}
+                </router-link>
+              </template>
+              <template #item.created={item}>
+                {{ item.created.slice(0, 10) }}
+              </template>
             </v-data-table>
           </v-container>
         </v-tab-item>
@@ -58,7 +94,7 @@
   </v-card>
 </template>
 <script>
-import {mapMutations, mapState} from 'vuex'
+import {mapActions, mapMutations, mapState} from 'vuex'
 import LikesModal from '@/components/LikesModal'
 
 export default {
@@ -72,6 +108,7 @@ export default {
       selected: [],
       activeTab: 0,
       headersCharacters: [
+        {text: '', value: 'image'},
         {
           text: 'Name',
           align: 'start',
@@ -79,8 +116,9 @@ export default {
           value: 'name'
         },
         {text: 'Gender', value: 'gender'},
-        {text: 'Origin', value: 'origin.name'},
-        {text: 'Last known location', value: 'location.name'},
+        {text: 'Status', value: 'status'},
+        {text: 'Origin', value: 'origin'},
+        {text: 'Last known location', value: 'location'},
         {text: 'Created', value: 'created'}
       ],
       headersLocations: [
@@ -114,30 +152,43 @@ export default {
       likedEpisodes: s => s.episodeStore.likedEpisodes
     }),
     header() {
-      if (this.activeTab === 0) {
-        return this.headersCharacters
-      } else if (this.activeTab === 1) {
-        return this.headersLocations
-      } else {
-        return this.headersEpisodes
+      switch (this.activeTab) {
+        case 0:
+          return this.headersCharacters
+        case 1:
+          return this.headersLocations
+        case 2:
+          return this.headersEpisodes
       }
     },
     item() {
-      if (this.activeTab === 0) {
-        return this.likedCharacters
-      } else if (this.activeTab === 1) {
-        return this.likedLocations
-      } else {
-        return this.likedEpisodes
+      switch (this.activeTab) {
+        case 0:
+          return this.likedCharacters
+        case 1:
+          return this.likedLocations
+        case 2:
+          return this.likedEpisodes
       }
     },
-    cardTitle(){
-      if (this.activeTab === 0) {
-        return 'Characters'
-      } else if (this.activeTab === 1) {
-        return 'Locations'
-      } else {
-        return 'Episodes'
+    cardTitle() {
+      switch (this.activeTab) {
+        case 0:
+          return 'Characters'
+        case 1:
+          return 'Locations'
+        case 2:
+          return 'Episodes'
+      }
+    },
+    link() {
+      switch (this.activeTab) {
+        case 0:
+          return 'CharacterItemPage'
+        case 1:
+          return 'LocationItemPage'
+        case 2:
+          return 'EpisodeItemPage'
       }
     }
   },
@@ -147,6 +198,7 @@ export default {
       REMOVE_LOCATION_LIKE: 'locationStore/REMOVE_LOCATION_LIKE',
       REMOVE_EPISODE_LIKE: 'episodeStore/REMOVE_EPISODE_LIKE'
     }),
+    ...mapActions('episodeStore', ['getEpisodeById']),
     onClick(value) {
       this.isOpen = true
       this.itemId = value

@@ -1,21 +1,15 @@
 <template>
   <v-container>
-    <v-card class='ma-3 pa-6'>
+    <v-card class='ma-1 ma-sm-3 pa-2 pa-sm-6'>
       <EditUserDialogComponent />
       <v-row justify='center'>
-        <v-col cols='7'>
-          <v-card-text class='text-h3 mb-8'>{{ fullName }}</v-card-text>
-          <v-card-subtitle class='text-h6'>Phone Number</v-card-subtitle>
-          <v-card-text>{{ currentUser.phone }}</v-card-text>
-          <v-card-subtitle class='text-h6'>Email</v-card-subtitle>
-          <v-card-text>{{ currentUser.email }}</v-card-text>
-          <v-card-subtitle class='text-h6'>Birth Date</v-card-subtitle>
-          <v-card-text>{{ currentUser.date }}</v-card-text>
-
-        </v-col>
-        <v-col cols='5'>
+        <v-col
+          cols='12'
+          sm='5'
+        >
           <v-avatar
-            size='300'
+            width='100%'
+            height='auto'
             class='mt-8 d-block'
             rounded
           >
@@ -30,6 +24,18 @@
               alt=' '
             >
           </v-avatar>
+        </v-col>
+        <v-col
+          cols='12'
+          sm='7'
+        >
+          <v-card-text class='text-h5 text-sm-h4'>{{ fullName }}</v-card-text>
+          <v-card-subtitle class='text-h6'>Phone Number</v-card-subtitle>
+          <v-card-text>{{ currentUser.phone }}</v-card-text>
+          <v-card-subtitle class='text-h6'>Email</v-card-subtitle>
+          <v-card-text>{{ currentUser.email }}</v-card-text>
+          <v-card-subtitle class='text-h6'>Birth Date</v-card-subtitle>
+          <v-card-text>{{ currentUser.date }}</v-card-text>
         </v-col>
       </v-row>
     </v-card>

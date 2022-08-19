@@ -20,14 +20,27 @@ export default {
 
 <style scoped>
 .wrapper {
-  height: 100vh;
+  height: 100%;
   background-color: rgba(91, 140, 232, .25);
   position: relative;
 }
 
+@media (min-width: 600px) {
+  .wrapper {
+    height: 100vh;
+  }
+}
+
 .btn-home {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 10px;
+  left: 0;
+}
+
+@media (min-width: 600px) {
+  .btn-home {
+    top: 20px;
+    left: 20px;
+  }
 }
 </style>

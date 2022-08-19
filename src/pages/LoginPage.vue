@@ -4,7 +4,7 @@
     <v-card
       elevation='2'
       class='pa-5'
-      width='500'
+      max-width='500'
     >
       <v-form
         ref='form'

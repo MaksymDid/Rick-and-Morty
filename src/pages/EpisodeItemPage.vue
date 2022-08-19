@@ -1,20 +1,20 @@
 <template>
   <div>
     <v-card
-      class='ma-2'
+      class='ma-2 my-5 ma-sm-5 pa-0 pa-sm-3'
     >
       <v-list-item three-line v-if='!loading'>
         <v-list-item-content>
-          <div class='text-h6 mb-1'>
+          <div class='text-h6 mb-3'>
             {{ episodeItem.name }}
           </div>
-          <div class='mb-2'>
+          <div class='mb-4'>
             Episode: {{ episodeItem.episode }}
           </div>
-          <div class='mb-2'>
+          <div class='mb-4'>
             Air date: {{ episodeItem.air_date }}
           </div>
-          <div class='mb-2'>
+          <div class='mb-4'>
             Created: {{episodeItem.created}}
           </div>
           <h3 class='text-center'>Residents:</h3>
@@ -25,6 +25,7 @@
                 sm='12'
                 v-for='character in characters'
                 :key='character.id'
+                class='pa-0'
               >
                 <CharactersCard :character='character'/>
               </v-col>
@@ -70,7 +71,7 @@ export default {
       async handler() {
         this.loading = true
         await this.getEpisode(this.$route.params.id)
-        this.CLEAR_CHARACTER_BY_IDS({})
+        this.CLEAR_CHARACTER_BY_IDS()
         await this.getCharactersByIds(this.charactersID.slice(0, this.slice).join(','))
         this.btnActive = this.episodeItem.isLiked
         this.loading = false

@@ -1,37 +1,36 @@
 <template>
   <div>
     <v-card
-      class='ma-2'
+      class='ma-2 my-5 ma-sm-5 pa-0 pa-sm-3'
     >
-      <v-list-item three-line v-if='!loading'>
-        <v-list-item-content>
-          <div class='text-h6 mb-1'>
+        <v-list-item-content v-if='!loading'>
+          <div class='text-h6 mb-3'>
             Name: {{ locationItem.name }}
           </div>
-          <div class='mb-2'>
+          <div class='mb-4'>
             Type: {{ locationItem.type }}
           </div>
-          <div class='mb-2'>
+          <div class='mb-4'>
             Dimension: {{ locationItem.dimension }}
           </div>
 
-          <div class='mb-2'>
+          <div class='mb-4'>
             Created: {{ locationItem.created }}
           </div>
-          <h3 class='text-center'>Residents:</h3>
-            <v-row ref='wrapper' @scroll='loadMore'>
-              <v-col
-                cols='12'
-                md='6'
-                sm='12'
-                v-for='character in characters'
-                :key='character.id'
-              >
-                <CharactersCard :character='character' />
-              </v-col>
-            </v-row>
+          <h3 class='text-center py-4 py-sm-2'>Residents:</h3>
+          <v-row ref='wrapper' @scroll='loadMore'>
+            <v-col
+              cols='12'
+              md='6'
+              sm='12'
+              v-for='character in characters'
+              :key='character.id'
+              class='pa-0'
+            >
+              <CharactersCard :character='character' />
+            </v-col>
+          </v-row>
         </v-list-item-content>
-      </v-list-item>
       <LikeButton :btn-active='btnActive' :on-click='onClick' />
     </v-card>
   </div>
@@ -65,7 +64,7 @@ export default {
       async handler() {
         this.loading = true
         await this.getLocation(this.$route.params.id)
-        this.CLEAR_CHARACTER_BY_IDS({})
+        this.CLEAR_CHARACTER_BY_IDS()
         await this.getCharactersByIds(this.charactersID.slice(0, this.slice).join(','))
         this.btnActive = this.locationItem.isLiked
         this.loading = false
@@ -74,7 +73,7 @@ export default {
       immediate: true
     },
     async slice() {
-      if (this.charactersID.length > this.slice-6) {
+      if (this.charactersID.length > this.slice - 6) {
         await this.getCharactersByIds(this.charactersID.slice(this.slice - 6, this.slice).join(','))
       }
     },
@@ -91,7 +90,6 @@ export default {
   beforeDestroy() {
     this.SET_LOCATION({})
     document.removeEventListener('scroll', this.loadMore)
-    this.CLEAR_CHARACTER_BY_IDS({})
   },
   methods: {
     ...mapActions({

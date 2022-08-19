@@ -49,7 +49,8 @@ export default {
         state.locationItem.isLiked = false
       }
       state.likedLocations = state.likedLocations.filter(item => item.id !== id)
-    }
+    },
+    CLEAR_LOCATION_LIKE: state => state.likedLocations = [],
   },
   actions: {
     async getLocations({commit}, params = null) {
